@@ -1,0 +1,147 @@
+{    
+    "type": "model",
+    "name": "Midjourney",
+    "params": [
+        {
+            "type": "section",
+            "name": "ArtMedium",
+            "params": [
+                {
+                    "type": "section",
+                    "name": "Drawing",
+                    "params": [
+                        {
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        },
+                        {
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        },
+                        {
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        },
+                        {
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        },
+                        {
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        },{
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "name": "ArtMedium",
+            "params": [
+                {
+                    "type": "section",
+                    "name": "Drawing",
+                    "params": [
+                        {
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        },
+                        {
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        },
+                        {
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        },
+                        {
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        },
+                        {
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        },{
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "name": "ArtMedium",
+            "params": [
+                {
+                    "type": "section",
+                    "name": "Drawing",
+                    "params": [
+                        {
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        },
+                        {
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        },
+                        {
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        },
+                        {
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        },
+                        {
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        },{
+                            "type": "parameter",
+                            "name": "Illustration",
+                            "imgPath": "resource/illustration.png",
+                            "prompt": "illustration"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
