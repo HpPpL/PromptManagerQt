@@ -1,0 +1,46 @@
+Camera
+Scenes: Editorial Photography, Cinematic, Filmic, High-Speed Photograph, Photography, Photojournalism, Portrait, Time-Lapse
+Film Types: Vintage, Multispectral Imaging, DSLR, Nikon D750, Shot on 70mm
+Lenses and Perspective: Telephoto, Wide Angle, Ultra-Wide Angle, Panorama, 360 Panorama, Fisheye Lens, Fisheye Lens Effect, Top-View, Side-View, Field of View
+Blur and Distortion: Blurry, Lens Distortion
+Camera settings: White Balance
+
+Display
+Resolution: 32k, Super-Resolution
+
+Lighting
+Types: Natural Lighting
+Global Illumination: Global Illumination
+
+Post-processing
+Reflection: Ray Tracing Reflections
+
+
+--ar 3:4 --style raw --stylize 150 --v 6.0
+ hyperrealistic, 4K, Octane render, unreal engine,
+ Nikon D850 105mm
+Canon EOS R5, 100mm, F 1.2 aperture setting capturing a moment, cinematic --ar 2:1
+shot with a Sony Alpha a7 III, using the Sony FE 85mm f/1.4 GM lens --ar 2:1
+ambient lighting and shot with a wide-angle lens, shot with a Nikon D850, using the Nikkor 24-70mm lens --ar 2:1 --v 5.1
+
+
+RAW photo, an award-winning National Geographic style HD photograph featuring the untamed beauty of the tropical rainforest. It's just after a rain shower at dusk, the orange-purple hues of twilight permeating the scene, casting long, dramatic shadows and creating a soft, diffused light that gives the landscape an almost ethereal feel. Taken using a Sony Alpha 1 with a 50mm f/1.8 lens, f/11 aperture, shutter speed 1/200s, ISO 100, This stunning image is rendered in insanely high resolution, realistic, 8k, HD, HDR, XDR, focus + sharpen + wide-angle 8K resolution + HDR10 Ken Burns effect + Adobe Lightroom + rule-of-thirds + high-detailed leaves + high-detailed bark + high-detailed feathers. An added touch of depth-of-field effect, lens flare, and digital negative are used to enhance the visual appeal. --ar 2:1
+
+Taken using a Sony Alpha 1 with a 50mm f/1.8 lens, f/11 aperture, shutter speed 1/200s, ISO 100, realistic, 8k, HD, HDR, XDR, focus + sharpen + wide-angle 8K resolution + HDR10 Ken Burns effect + Adobe Lightroom + rule-of-thirds + high-detailed leaves + high-detailed bark + high-detailed fur --ar 2:1
+
+Turn on RTX for realistic detail.
+
+
+ice::3 cream
+Добавление двойного двоеточия :: к текстовым подсказкам указывает боту Midjourney, что он должен рассматривать каждую часть подсказки отдельно. Вы также можете присвоить вес каждой части подсказки, чтобы увеличить присутствие этой функции или удалить ее полностью.
+
+[Forgotten old locomotive]::7 in the [jungle]::3
+Целые разделы вашей подсказки можно утяжелить, заключив их в квадратные скобки, как показано выше. Вы заметите, что изображение слева на 70% больше соответствует термину "забытый старый локомотив", что делает локомотив более заметным на изображении. На изображении справа значение термина "джунгли" составляет 70%.
+
+{green, purple, blue} apple
+Подсказки с перестановкой позволяют быстро генерировать варианты подсказки с помощью одной команды / imagine. Заключите нужную переменную в фигурные скобки, как показано выше. Это эквивалентно написанию 3 отдельных подсказок: зеленое яблоко, фиолетовое яблоко и синее яблоко. При правильном использовании этот метод позволяет значительно сэкономить время при создании и доработке изображений.
+
+a treehouse --s {50, 500, 1000}
+Будьте осторожны при использовании этого инструмента, поскольку он может очень быстро израсходовать все ваши минуты работы графического процессора! Запрос / информация боту Midjourney, чтобы увидеть оставшиеся минуты быстрой генерации времени.
+
+
