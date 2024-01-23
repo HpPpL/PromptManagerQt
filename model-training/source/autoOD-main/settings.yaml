@@ -1,0 +1,7 @@
+
+mmdet_dir: "/Users/elinachertova/PycharmProjects/autoODv2/mmdetection"
+dataset_type: "CocoDataset"
+task: "Object Detection"
+dataset_dir: "/Users/elinachertova/PycharmProjects/autoODv2/weapon/weapon"
+base_dir: "/Users/elinachertova/PycharmProjects/autoODv2"
+epoch_number: 150

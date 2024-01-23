@@ -1,0 +1,14 @@
+onnx~=1.15.0
+onnxruntime~=1.16.3
+globox
+torch
+torchvision~=0.16.1
+chardet
+mmdet~=3.2.0
+norfair
+opencv-python~=4.8.1.78
+numpy==1.23.5
+
+requests~=2.28.2
+pyyaml
+matplotlib~=3.8.2

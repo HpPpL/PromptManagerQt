@@ -1,0 +1,1384 @@
+01/22 11:20:32 - mmengine - INFO - 
+------------------------------------------------------------
+System environment:
+    sys.platform: linux
+    Python: 3.10.12 (main, Nov 20 2023, 15:14:05) [GCC 11.4.0]
+    CUDA available: True
+    numpy_random_seed: 0
+    GPU 0: Tesla T4
+    CUDA_HOME: /usr/local/cuda
+    NVCC: Cuda compilation tools, release 12.2, V12.2.140
+    GCC: x86_64-linux-gnu-gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0
+    PyTorch: 2.1.0+cu121
+    PyTorch compiling details: PyTorch built with:
+  - GCC 9.3
+  - C++ Version: 201703
+  - Intel(R) oneAPI Math Kernel Library Version 2022.2-Product Build 20220804 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v3.1.1 (Git Hash 64f6bcbcbab628e96f33a62c3e975f8535a7bde4)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX512
+  - CUDA Runtime 12.1
+  - NVCC architecture flags: -gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86;-gencode;arch=compute_90,code=sm_90
+  - CuDNN 8.9.2
+  - Magma 2.6.1
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=12.1, CUDNN_VERSION=8.9.2, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -D_GLIBCXX_USE_CXX11_ABI=0 -fabi-version=11 -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOROCTRACER -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=old-style-cast -Wno-invalid-partial-specialization -Wno-unused-private-field -Wno-aligned-allocation-unavailable -Wno-missing-braces -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Werror=cast-function-type -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_DISABLE_GPU_ASSERTS=ON, TORCH_VERSION=2.1.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=1, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+    TorchVision: 0.16.0+cu121
+    OpenCV: 4.8.0
+    MMEngine: 0.10.2
+
+Runtime environment:
+    cudnn_benchmark: False
+    dist_cfg: {'backend': 'nccl'}
+    mp_cfg: {'mp_start_method': 'fork', 'opencv_num_threads': 0}
+    seed: 0
+    deterministic: True
+    Distributed launcher: none
+    Distributed training: False
+    GPU number: 1
+------------------------------------------------------------
+
+01/22 11:20:33 - mmengine - INFO - Config:
+auto_scale_lr = dict(base_batch_size=16, enable=False)
+backend_args = None
+base_lr = 0.004
+checkpoint = 'https://download.openmmlab.com/mmdetection/v3.0/rtmdet/cspnext_rsb_pretrain/cspnext-s_imagenet_600e.pth'
+custom_hooks = [
+    dict(
+        ema_type='ExpMomentumEMA',
+        momentum=0.0002,
+        priority=49,
+        type='EMAHook',
+        update_buffers=True),
+    dict(
+        switch_epoch=280,
+        switch_pipeline=[
+            dict(backend_args=None, type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True),
+            dict(
+                keep_ratio=True,
+                ratio_range=(
+                    0.5,
+                    2.0,
+                ),
+                scale=(
+                    640,
+                    640,
+                ),
+                type='RandomResize'),
+            dict(crop_size=(
+                640,
+                640,
+            ), type='RandomCrop'),
+            dict(type='YOLOXHSVRandomAug'),
+            dict(prob=0.5, type='RandomFlip'),
+            dict(
+                pad_val=dict(img=(
+                    114,
+                    114,
+                    114,
+                )),
+                size=(
+                    640,
+                    640,
+                ),
+                type='Pad'),
+            dict(type='PackDetInputs'),
+        ],
+        type='PipelineSwitchHook'),
+]
+data_root = '/content/autoOD-main/src/all_images_data/'
+dataset_type = 'CocoDataset'
+default_hooks = dict(
+    checkpoint=dict(
+        interval=2, max_keep_ckpts=5, save_best='auto', type='CheckpointHook'),
+    early_stopping=dict(
+        min_delta=0.01,
+        monitor='coco/bbox_mAP',
+        patience=20,
+        type='EarlyStoppingHook'),
+    logger=dict(interval=50, type='LoggerHook'),
+    param_scheduler=dict(type='ParamSchedulerHook'),
+    sampler_seed=dict(type='DistSamplerSeedHook'),
+    timer=dict(type='IterTimerHook'),
+    visualization=dict(type='DetVisualizationHook'))
+default_scope = 'mmdet'
+env_cfg = dict(
+    cudnn_benchmark=False,
+    dist_cfg=dict(backend='nccl'),
+    mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0))
+img_scales = [
+    (
+        640,
+        640,
+    ),
+    (
+        320,
+        320,
+    ),
+    (
+        960,
+        960,
+    ),
+]
+interval = 10
+launcher = 'none'
+load_from = None
+log_level = 'INFO'
+log_processor = dict(by_epoch=True, type='LogProcessor', window_size=50)
+max_epochs = 75
+metainfo = dict(
+    classes=(
+        'Person',
+        'person',
+    ), palette=[
+        (
+            220,
+            20,
+            60,
+        ),
+    ])
+model = dict(
+    backbone=dict(
+        act_cfg=dict(inplace=True, type='SiLU'),
+        arch='P5',
+        channel_attention=True,
+        deepen_factor=0.33,
+        expand_ratio=0.5,
+        init_cfg=dict(
+            checkpoint=
+            'https://download.openmmlab.com/mmdetection/v3.0/rtmdet/cspnext_rsb_pretrain/cspnext-s_imagenet_600e.pth',
+            prefix='backbone.',
+            type='Pretrained'),
+        norm_cfg=dict(type='SyncBN'),
+        type='CSPNeXt',
+        widen_factor=0.5),
+    bbox_head=dict(
+        act_cfg=dict(inplace=True, type='SiLU'),
+        anchor_generator=dict(
+            offset=0, strides=[
+                8,
+                16,
+                32,
+            ], type='MlvlPointGenerator'),
+        bbox_coder=dict(type='DistancePointBBoxCoder'),
+        exp_on_reg=False,
+        feat_channels=128,
+        in_channels=128,
+        loss_bbox=dict(loss_weight=2.0, type='GIoULoss'),
+        loss_cls=dict(
+            beta=2.0,
+            loss_weight=1.0,
+            type='QualityFocalLoss',
+            use_sigmoid=True),
+        norm_cfg=dict(type='SyncBN'),
+        num_classes=2,
+        pred_kernel_size=1,
+        share_conv=True,
+        stacked_convs=2,
+        type='RTMDetSepBNHead',
+        with_objectness=False),
+    data_preprocessor=dict(
+        batch_augments=None,
+        bgr_to_rgb=False,
+        mean=[
+            103.53,
+            116.28,
+            123.675,
+        ],
+        std=[
+            57.375,
+            57.12,
+            58.395,
+        ],
+        type='DetDataPreprocessor'),
+    neck=dict(
+        act_cfg=dict(inplace=True, type='SiLU'),
+        expand_ratio=0.5,
+        in_channels=[
+            128,
+            256,
+            512,
+        ],
+        norm_cfg=dict(type='SyncBN'),
+        num_csp_blocks=1,
+        out_channels=128,
+        type='CSPNeXtPAFPN'),
+    test_cfg=dict(
+        max_per_img=300,
+        min_bbox_size=0,
+        nms=dict(iou_threshold=0.65, type='nms'),
+        nms_pre=30000,
+        score_thr=0.1),
+    train_cfg=dict(
+        allowed_border=-1,
+        assigner=dict(topk=13, type='DynamicSoftLabelAssigner'),
+        debug=False,
+        pos_weight=-1),
+    type='RTMDet')
+optim_wrapper = dict(
+    optimizer=dict(lr=0.004, type='AdamW', weight_decay=0.05),
+    paramwise_cfg=dict(
+        bias_decay_mult=0, bypass_duplicate=True, norm_decay_mult=0),
+    type='OptimWrapper')
+param_scheduler = [
+    dict(begin=0, by_epoch=False, end=37, start_factor=1e-05, type='LinearLR'),
+    dict(
+        T_max=75,
+        begin=37,
+        by_epoch=True,
+        convert_to_iter_based=True,
+        end=75,
+        eta_min=0.0002,
+        type='CosineAnnealingLR'),
+]
+randomness = dict(deterministic=True, seed=0)
+resume = False
+stage2_num_epochs = 20
+test_cfg = dict(type='TestLoop')
+test_dataloader = dict(
+    batch_size=5,
+    dataset=dict(
+        ann_file='test.json',
+        backend_args=None,
+        data_prefix=dict(img='test/'),
+        data_root='/content/autoOD-main/src/all_images_data/',
+        metainfo=dict(
+            classes=(
+                'Person',
+                'person',
+            ), palette=[
+                (
+                    220,
+                    20,
+                    60,
+                ),
+            ]),
+        pipeline=[
+            dict(backend_args=None, type='LoadImageFromFile'),
+            dict(keep_ratio=True, scale=(
+                640,
+                640,
+            ), type='Resize'),
+            dict(
+                pad_val=dict(img=(
+                    114,
+                    114,
+                    114,
+                )),
+                size=(
+                    640,
+                    640,
+                ),
+                type='Pad'),
+            dict(type='LoadAnnotations', with_bbox=True),
+            dict(
+                meta_keys=(
+                    'img_id',
+                    'img_path',
+                    'ori_shape',
+                    'img_shape',
+                    'scale_factor',
+                ),
+                type='PackDetInputs'),
+        ],
+        test_mode=True,
+        type='CocoDataset'),
+    drop_last=False,
+    num_workers=10,
+    persistent_workers=True,
+    sampler=dict(shuffle=False, type='DefaultSampler'))
+test_evaluator = dict(
+    ann_file='/content/autoOD-main/src/all_images_data/test.json',
+    backend_args=None,
+    format_only=False,
+    metric='bbox',
+    proposal_nums=(
+        100,
+        1,
+        10,
+    ),
+    type='CocoMetric')
+test_pipeline = [
+    dict(backend_args=None, type='LoadImageFromFile'),
+    dict(keep_ratio=True, scale=(
+        640,
+        640,
+    ), type='Resize'),
+    dict(pad_val=dict(img=(
+        114,
+        114,
+        114,
+    )), size=(
+        640,
+        640,
+    ), type='Pad'),
+    dict(type='LoadAnnotations', with_bbox=True),
+    dict(
+        meta_keys=(
+            'img_id',
+            'img_path',
+            'ori_shape',
+            'img_shape',
+            'scale_factor',
+        ),
+        type='PackDetInputs'),
+]
+train_cfg = dict(
+    dynamic_intervals=[
+        (
+            280,
+            1,
+        ),
+    ],
+    max_epochs=75,
+    type='EpochBasedTrainLoop',
+    val_interval=10)
+train_dataloader = dict(
+    batch_sampler=None,
+    batch_size=16,
+    dataset=dict(
+        ann_file='train.json',
+        backend_args=None,
+        data_prefix=dict(img='train/'),
+        data_root='/content/autoOD-main/src/all_images_data/',
+        filter_cfg=dict(filter_empty_gt=True, min_size=32),
+        metainfo=dict(
+            classes=(
+                'Person',
+                'person',
+            ), palette=[
+                (
+                    220,
+                    20,
+                    60,
+                ),
+            ]),
+        pipeline=[
+            dict(backend_args=None, type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True),
+            dict(img_scale=(
+                640,
+                640,
+            ), pad_val=114.0, type='CachedMosaic'),
+            dict(
+                keep_ratio=True,
+                ratio_range=(
+                    0.5,
+                    2.0,
+                ),
+                scale=(
+                    1280,
+                    1280,
+                ),
+                type='RandomResize'),
+            dict(crop_size=(
+                640,
+                640,
+            ), type='RandomCrop'),
+            dict(type='YOLOXHSVRandomAug'),
+            dict(prob=0.5, type='RandomFlip'),
+            dict(
+                pad_val=dict(img=(
+                    114,
+                    114,
+                    114,
+                )),
+                size=(
+                    640,
+                    640,
+                ),
+                type='Pad'),
+            dict(
+                img_scale=(
+                    640,
+                    640,
+                ),
+                max_cached_images=20,
+                pad_val=(
+                    114,
+                    114,
+                    114,
+                ),
+                ratio_range=(
+                    1.0,
+                    1.0,
+                ),
+                type='CachedMixUp'),
+            dict(type='PackDetInputs'),
+        ],
+        type='CocoDataset'),
+    num_workers=10,
+    persistent_workers=True,
+    pin_memory=True,
+    sampler=dict(shuffle=True, type='DefaultSampler'))
+train_pipeline = [
+    dict(backend_args=None, type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True),
+    dict(img_scale=(
+        640,
+        640,
+    ), pad_val=114.0, type='CachedMosaic'),
+    dict(
+        keep_ratio=True,
+        ratio_range=(
+            0.5,
+            2.0,
+        ),
+        scale=(
+            1280,
+            1280,
+        ),
+        type='RandomResize'),
+    dict(crop_size=(
+        640,
+        640,
+    ), type='RandomCrop'),
+    dict(type='YOLOXHSVRandomAug'),
+    dict(prob=0.5, type='RandomFlip'),
+    dict(pad_val=dict(img=(
+        114,
+        114,
+        114,
+    )), size=(
+        640,
+        640,
+    ), type='Pad'),
+    dict(
+        img_scale=(
+            640,
+            640,
+        ),
+        max_cached_images=20,
+        pad_val=(
+            114,
+            114,
+            114,
+        ),
+        ratio_range=(
+            1.0,
+            1.0,
+        ),
+        type='CachedMixUp'),
+    dict(type='PackDetInputs'),
+]
+train_pipeline_stage2 = [
+    dict(backend_args=None, type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True),
+    dict(
+        keep_ratio=True,
+        ratio_range=(
+            0.5,
+            2.0,
+        ),
+        scale=(
+            640,
+            640,
+        ),
+        type='RandomResize'),
+    dict(crop_size=(
+        640,
+        640,
+    ), type='RandomCrop'),
+    dict(type='YOLOXHSVRandomAug'),
+    dict(prob=0.5, type='RandomFlip'),
+    dict(pad_val=dict(img=(
+        114,
+        114,
+        114,
+    )), size=(
+        640,
+        640,
+    ), type='Pad'),
+    dict(type='PackDetInputs'),
+]
+tta_model = dict(
+    tta_cfg=dict(max_per_img=100, nms=dict(iou_threshold=0.6, type='nms')),
+    type='DetTTAModel')
+tta_pipeline = [
+    dict(backend_args=None, type='LoadImageFromFile'),
+    dict(
+        transforms=[
+            [
+                dict(keep_ratio=True, scale=(
+                    640,
+                    640,
+                ), type='Resize'),
+                dict(keep_ratio=True, scale=(
+                    320,
+                    320,
+                ), type='Resize'),
+                dict(keep_ratio=True, scale=(
+                    960,
+                    960,
+                ), type='Resize'),
+            ],
+            [
+                dict(prob=1.0, type='RandomFlip'),
+                dict(prob=0.0, type='RandomFlip'),
+            ],
+            [
+                dict(
+                    pad_val=dict(img=(
+                        114,
+                        114,
+                        114,
+                    )),
+                    size=(
+                        960,
+                        960,
+                    ),
+                    type='Pad'),
+            ],
+            [
+                dict(type='LoadAnnotations', with_bbox=True),
+            ],
+            [
+                dict(
+                    meta_keys=(
+                        'img_id',
+                        'img_path',
+                        'ori_shape',
+                        'img_shape',
+                        'scale_factor',
+                        'flip',
+                        'flip_direction',
+                    ),
+                    type='PackDetInputs'),
+            ],
+        ],
+        type='TestTimeAug'),
+]
+val_cfg = dict(type='ValLoop')
+val_dataloader = dict(
+    batch_size=5,
+    dataset=dict(
+        ann_file='test.json',
+        backend_args=None,
+        data_prefix=dict(img='test/'),
+        data_root='/content/autoOD-main/src/all_images_data/',
+        metainfo=dict(
+            classes=(
+                'Person',
+                'person',
+            ), palette=[
+                (
+                    220,
+                    20,
+                    60,
+                ),
+            ]),
+        pipeline=[
+            dict(backend_args=None, type='LoadImageFromFile'),
+            dict(keep_ratio=True, scale=(
+                640,
+                640,
+            ), type='Resize'),
+            dict(
+                pad_val=dict(img=(
+                    114,
+                    114,
+                    114,
+                )),
+                size=(
+                    640,
+                    640,
+                ),
+                type='Pad'),
+            dict(type='LoadAnnotations', with_bbox=True),
+            dict(
+                meta_keys=(
+                    'img_id',
+                    'img_path',
+                    'ori_shape',
+                    'img_shape',
+                    'scale_factor',
+                ),
+                type='PackDetInputs'),
+        ],
+        test_mode=True,
+        type='CocoDataset'),
+    drop_last=False,
+    num_workers=10,
+    persistent_workers=True,
+    sampler=dict(shuffle=False, type='DefaultSampler'))
+val_evaluator = dict(
+    ann_file='/content/autoOD-main/src/all_images_data/test.json',
+    backend_args=None,
+    format_only=False,
+    metric='bbox',
+    proposal_nums=(
+        100,
+        1,
+        10,
+    ),
+    type='CocoMetric')
+vis_backends = [
+    dict(type='LocalVisBackend'),
+]
+visualizer = dict(
+    name='visualizer',
+    type='DetLocalVisualizer',
+    vis_backends=[
+        dict(type='LocalVisBackend'),
+    ])
+work_dir = '/content/autoOD-main/runs_archive/train1/models'
+
+01/22 11:20:35 - mmengine - INFO - Distributed training is not used, all SyncBatchNorm (SyncBN) layers in the model will be automatically reverted to BatchNormXd layers if they are used.
+01/22 11:20:35 - mmengine - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(49          ) EMAHook                            
+(BELOW_NORMAL) LoggerHook                         
+(LOWEST      ) EarlyStoppingHook                  
+ -------------------- 
+after_load_checkpoint:
+(49          ) EMAHook                            
+ -------------------- 
+before_train:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(49          ) EMAHook                            
+(NORMAL      ) IterTimerHook                      
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) DistSamplerSeedHook                
+(NORMAL      ) PipelineSwitchHook                 
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_train_iter:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(49          ) EMAHook                            
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) LoggerHook                         
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) IterTimerHook                      
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_val:
+(VERY_HIGH   ) RuntimeInfoHook                    
+ -------------------- 
+before_val_epoch:
+(49          ) EMAHook                            
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+before_val_iter:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) DetVisualizationHook               
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_val_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(49          ) EMAHook                            
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) LoggerHook                         
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+(LOWEST      ) EarlyStoppingHook                  
+ -------------------- 
+after_val:
+(VERY_HIGH   ) RuntimeInfoHook                    
+ -------------------- 
+before_save_checkpoint:
+(49          ) EMAHook                            
+ -------------------- 
+after_train:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_test:
+(VERY_HIGH   ) RuntimeInfoHook                    
+ -------------------- 
+before_test_epoch:
+(49          ) EMAHook                            
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+before_test_iter:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_test_iter:
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) DetVisualizationHook               
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_test_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(49          ) EMAHook                            
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_test:
+(VERY_HIGH   ) RuntimeInfoHook                    
+ -------------------- 
+after_run:
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+loading annotations into memory...
+Done (t=0.02s)
+creating index...
+index created!
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stem.0.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stem.0.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stem.1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stem.1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stem.2.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stem.2.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage1.0.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage1.0.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage1.1.main_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage1.1.main_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage1.1.short_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage1.1.short_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage1.1.final_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage1.1.final_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage1.1.blocks.0.conv1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage1.1.blocks.0.conv1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage1.1.blocks.0.conv2.depthwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage1.1.blocks.0.conv2.depthwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage1.1.blocks.0.conv2.pointwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage1.1.blocks.0.conv2.pointwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage1.1.attention.fc.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.0.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.0.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.main_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.main_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.short_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.short_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.final_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.final_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.blocks.0.conv1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.blocks.0.conv1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.blocks.0.conv2.depthwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.blocks.0.conv2.depthwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.blocks.0.conv2.pointwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.blocks.0.conv2.pointwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.blocks.1.conv1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.blocks.1.conv1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.blocks.1.conv2.depthwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.blocks.1.conv2.depthwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.blocks.1.conv2.pointwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.blocks.1.conv2.pointwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage2.1.attention.fc.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.0.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.0.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.main_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.main_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.short_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.short_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.final_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.final_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.blocks.0.conv1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.blocks.0.conv1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.blocks.0.conv2.depthwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.blocks.0.conv2.depthwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.blocks.0.conv2.pointwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.blocks.0.conv2.pointwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.blocks.1.conv1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.blocks.1.conv1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.blocks.1.conv2.depthwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.blocks.1.conv2.depthwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.blocks.1.conv2.pointwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.blocks.1.conv2.pointwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage3.1.attention.fc.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.0.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.0.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.1.conv1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.1.conv1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.1.conv2.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.1.conv2.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.2.main_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.2.main_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.2.short_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.2.short_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.2.final_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.2.final_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.2.blocks.0.conv1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.2.blocks.0.conv1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.2.blocks.0.conv2.depthwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.2.blocks.0.conv2.depthwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.2.blocks.0.conv2.pointwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.2.blocks.0.conv2.pointwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- backbone.stage4.2.attention.fc.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.reduce_layers.0.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.reduce_layers.0.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.reduce_layers.1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.reduce_layers.1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.0.main_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.0.main_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.0.short_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.0.short_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.0.final_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.0.final_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.0.blocks.0.conv1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.0.blocks.0.conv1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.0.blocks.0.conv2.depthwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.0.blocks.0.conv2.depthwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.0.blocks.0.conv2.pointwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.0.blocks.0.conv2.pointwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.1.main_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.1.main_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.1.short_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.1.short_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.1.final_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.1.final_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.1.blocks.0.conv1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.1.blocks.0.conv1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.1.blocks.0.conv2.depthwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.1.blocks.0.conv2.depthwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.1.blocks.0.conv2.pointwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.top_down_blocks.1.blocks.0.conv2.pointwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.downsamples.0.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.downsamples.0.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.downsamples.1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.downsamples.1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.0.main_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.0.main_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.0.short_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.0.short_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.0.final_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.0.final_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.0.blocks.0.conv1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.0.blocks.0.conv1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.0.blocks.0.conv2.depthwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.0.blocks.0.conv2.depthwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.0.blocks.0.conv2.pointwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.0.blocks.0.conv2.pointwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.1.main_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.1.main_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.1.short_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.1.short_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.1.final_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.1.final_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.1.blocks.0.conv1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.1.blocks.0.conv1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.1.blocks.0.conv2.depthwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.1.blocks.0.conv2.depthwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.1.blocks.0.conv2.pointwise_conv.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.bottom_up_blocks.1.blocks.0.conv2.pointwise_conv.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.out_convs.0.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.out_convs.0.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.out_convs.1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.out_convs.1.bn.bias:weight_decay=0.0
+/usr/local/lib/python3.10/dist-packages/torch/utils/data/dataloader.py:557: UserWarning: This DataLoader will create 10 worker processes in total. Our suggested max number of worker in current system is 2, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.out_convs.2.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- neck.out_convs.2.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.cls_convs.0.0.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.cls_convs.0.0.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.cls_convs.0.1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.cls_convs.0.1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - WARNING - bbox_head.cls_convs.1.0.conv is duplicate. It is skipped since bypass_duplicate=True
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.cls_convs.1.0.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.cls_convs.1.0.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - WARNING - bbox_head.cls_convs.1.1.conv is duplicate. It is skipped since bypass_duplicate=True
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.cls_convs.1.1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.cls_convs.1.1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - WARNING - bbox_head.cls_convs.2.0.conv is duplicate. It is skipped since bypass_duplicate=True
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.cls_convs.2.0.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.cls_convs.2.0.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - WARNING - bbox_head.cls_convs.2.1.conv is duplicate. It is skipped since bypass_duplicate=True
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.cls_convs.2.1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.cls_convs.2.1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.reg_convs.0.0.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.reg_convs.0.0.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.reg_convs.0.1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.reg_convs.0.1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - WARNING - bbox_head.reg_convs.1.0.conv is duplicate. It is skipped since bypass_duplicate=True
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.reg_convs.1.0.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.reg_convs.1.0.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - WARNING - bbox_head.reg_convs.1.1.conv is duplicate. It is skipped since bypass_duplicate=True
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.reg_convs.1.1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.reg_convs.1.1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - WARNING - bbox_head.reg_convs.2.0.conv is duplicate. It is skipped since bypass_duplicate=True
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.reg_convs.2.0.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.reg_convs.2.0.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - WARNING - bbox_head.reg_convs.2.1.conv is duplicate. It is skipped since bypass_duplicate=True
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.reg_convs.2.1.bn.weight:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.reg_convs.2.1.bn.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.rtm_cls.0.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.rtm_cls.1.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.rtm_cls.2.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.rtm_reg.0.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.rtm_reg.1.bias:weight_decay=0.0
+01/22 11:20:37 - mmengine - INFO - paramwise_options -- bbox_head.rtm_reg.2.bias:weight_decay=0.0
+loading annotations into memory...
+Done (t=0.02s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.01s)
+creating index...
+index created!
+01/22 11:20:39 - mmengine - INFO - load backbone. in model from: https://download.openmmlab.com/mmdetection/v3.0/rtmdet/cspnext_rsb_pretrain/cspnext-s_imagenet_600e.pth
+Loads checkpoint by http backend from path: https://download.openmmlab.com/mmdetection/v3.0/rtmdet/cspnext_rsb_pretrain/cspnext-s_imagenet_600e.pth
+Downloading: "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/cspnext_rsb_pretrain/cspnext-s_imagenet_600e.pth" to /root/.cache/torch/hub/checkpoints/cspnext-s_imagenet_600e.pth
+01/22 11:20:46 - mmengine - WARNING - "FileClient" will be deprecated in future. Please use io functions in https://mmengine.readthedocs.io/en/latest/api/fileio.html#file-io
+01/22 11:20:46 - mmengine - WARNING - "HardDiskBackend" is the alias of "LocalBackend" and the former will be deprecated in future.
+01/22 11:20:46 - mmengine - INFO - Checkpoints will be saved to /content/autoOD-main/runs_archive/train1/models.
+/usr/local/lib/python3.10/dist-packages/torch/utils/data/dataloader.py:557: UserWarning: This DataLoader will create 10 worker processes in total. Our suggested max number of worker in current system is 2, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+/usr/local/lib/python3.10/dist-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at ../aten/src/ATen/native/TensorShape.cpp:3526.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+01/22 11:22:25 - mmengine - INFO - Epoch(train)  [1][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 4:40:31  time: 1.9802  data_time: 0.2060  memory: 7622  loss: 1.7397  loss_cls: 0.6523  loss_bbox: 1.0874
+01/22 11:23:37 - mmengine - INFO - Epoch(train)  [1][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 4:00:38  time: 1.4371  data_time: 0.0084  memory: 7622  loss: 1.4298  loss_cls: 0.6024  loss_bbox: 0.8273
+01/22 11:23:50 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 11:25:24 - mmengine - INFO - Epoch(train)  [2][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:57:17  time: 1.8923  data_time: 0.2580  memory: 7622  loss: 1.2812  loss_cls: 0.5589  loss_bbox: 0.7223
+01/22 11:26:34 - mmengine - INFO - Epoch(train)  [2][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:46:10  time: 1.3991  data_time: 0.0107  memory: 7622  loss: 1.1987  loss_cls: 0.5399  loss_bbox: 0.6589
+01/22 11:26:47 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 11:26:47 - mmengine - INFO - Saving checkpoint at 2 epochs
+01/22 11:28:21 - mmengine - INFO - Epoch(train)  [3][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:44:46  time: 1.8414  data_time: 0.2515  memory: 7622  loss: 1.1152  loss_cls: 0.5076  loss_bbox: 0.6076
+01/22 11:29:31 - mmengine - INFO - Epoch(train)  [3][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:38:30  time: 1.3959  data_time: 0.0088  memory: 7622  loss: 1.1221  loss_cls: 0.5294  loss_bbox: 0.5927
+01/22 11:29:43 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 11:31:16 - mmengine - INFO - Epoch(train)  [4][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:37:55  time: 1.8483  data_time: 0.2425  memory: 7622  loss: 1.0562  loss_cls: 0.4955  loss_bbox: 0.5607
+01/22 11:32:25 - mmengine - INFO - Epoch(train)  [4][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:33:04  time: 1.3736  data_time: 0.0099  memory: 7622  loss: 0.9992  loss_cls: 0.4562  loss_bbox: 0.5431
+01/22 11:32:37 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 11:32:37 - mmengine - INFO - Saving checkpoint at 4 epochs
+01/22 11:34:11 - mmengine - INFO - Epoch(train)  [5][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:32:18  time: 1.8308  data_time: 0.2605  memory: 7622  loss: 0.9483  loss_cls: 0.4261  loss_bbox: 0.5222
+01/22 11:35:19 - mmengine - INFO - Epoch(train)  [5][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:28:31  time: 1.3769  data_time: 0.0102  memory: 7622  loss: 0.9332  loss_cls: 0.4091  loss_bbox: 0.5240
+01/22 11:35:32 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 11:37:03 - mmengine - INFO - Epoch(train)  [6][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:27:33  time: 1.8139  data_time: 0.2251  memory: 7622  loss: 0.8719  loss_cls: 0.3720  loss_bbox: 0.4999
+01/22 11:38:12 - mmengine - INFO - Epoch(train)  [6][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:24:22  time: 1.3802  data_time: 0.0092  memory: 7622  loss: 0.8660  loss_cls: 0.3731  loss_bbox: 0.4929
+01/22 11:38:25 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 11:38:25 - mmengine - INFO - Saving checkpoint at 6 epochs
+01/22 11:39:58 - mmengine - INFO - Epoch(train)  [7][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:23:28  time: 1.8167  data_time: 0.2326  memory: 7622  loss: 0.8674  loss_cls: 0.3705  loss_bbox: 0.4968
+01/22 11:41:08 - mmengine - INFO - Epoch(train)  [7][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:20:45  time: 1.3913  data_time: 0.0113  memory: 7622  loss: 0.8480  loss_cls: 0.3624  loss_bbox: 0.4857
+01/22 11:41:20 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 11:42:51 - mmengine - INFO - Epoch(train)  [8][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:19:47  time: 1.8203  data_time: 0.2027  memory: 7622  loss: 0.8135  loss_cls: 0.3343  loss_bbox: 0.4792
+01/22 11:44:01 - mmengine - INFO - Epoch(train)  [8][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:17:20  time: 1.3950  data_time: 0.0101  memory: 7622  loss: 0.7762  loss_cls: 0.3149  loss_bbox: 0.4613
+01/22 11:44:14 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 11:44:14 - mmengine - INFO - Saving checkpoint at 8 epochs
+01/22 11:45:47 - mmengine - INFO - Epoch(train)  [9][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:16:16  time: 1.8181  data_time: 0.1919  memory: 7622  loss: 0.7898  loss_cls: 0.3184  loss_bbox: 0.4714
+01/22 11:46:43 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 11:46:57 - mmengine - INFO - Epoch(train)  [9][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:13:57  time: 1.3850  data_time: 0.0109  memory: 7622  loss: 0.7412  loss_cls: 0.2934  loss_bbox: 0.4479
+01/22 11:47:10 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 11:48:42 - mmengine - INFO - Epoch(train) [10][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:13:04  time: 1.8521  data_time: 0.2055  memory: 7622  loss: 0.7617  loss_cls: 0.3017  loss_bbox: 0.4600
+01/22 11:49:51 - mmengine - INFO - Epoch(train) [10][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:10:52  time: 1.3829  data_time: 0.0105  memory: 7622  loss: 0.7424  loss_cls: 0.2968  loss_bbox: 0.4456
+01/22 11:50:04 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 11:50:04 - mmengine - INFO - Saving checkpoint at 10 epochs
+/usr/local/lib/python3.10/dist-packages/torch/utils/data/dataloader.py:557: UserWarning: This DataLoader will create 10 worker processes in total. Our suggested max number of worker in current system is 2, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+01/22 11:50:15 - mmengine - INFO - Epoch(val) [10][50/91]    eta: 0:00:06  time: 0.1622  data_time: 0.0489  memory: 7622  
+01/22 11:50:18 - mmengine - INFO - Evaluating bbox...
+Loading and preparing results...
+DONE (t=0.36s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=2.25s).
+Accumulating evaluation results...
+DONE (t=0.43s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.326
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.705
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.251
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.189
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.366
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.328
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.137
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.455
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.494
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.317
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.541
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.438
+01/22 11:50:22 - mmengine - INFO - bbox_mAP_copypaste: 0.326 0.705 0.251 0.189 0.366 0.328
+01/22 11:50:22 - mmengine - INFO - Epoch(val) [10][91/91]    coco/bbox_mAP: 0.3260  coco/bbox_mAP_50: 0.7050  coco/bbox_mAP_75: 0.2510  coco/bbox_mAP_s: 0.1890  coco/bbox_mAP_m: 0.3660  coco/bbox_mAP_l: 0.3280  data_time: 0.0322  time: 0.1272
+01/22 11:50:24 - mmengine - INFO - The best checkpoint with 0.3260 coco/bbox_mAP at 10 epoch is saved to best_coco_bbox_mAP_epoch_10.pth.
+01/22 11:52:02 - mmengine - INFO - Epoch(train) [11][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:10:05  time: 1.8857  data_time: 0.2183  memory: 7622  loss: 0.7653  loss_cls: 0.3109  loss_bbox: 0.4544
+01/22 11:53:11 - mmengine - INFO - Epoch(train) [11][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:08:01  time: 1.3946  data_time: 0.0094  memory: 7622  loss: 0.7461  loss_cls: 0.2997  loss_bbox: 0.4463
+01/22 11:53:24 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 11:54:58 - mmengine - INFO - Epoch(train) [12][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:07:04  time: 1.8660  data_time: 0.2271  memory: 7622  loss: 0.7355  loss_cls: 0.2920  loss_bbox: 0.4435
+01/22 11:56:09 - mmengine - INFO - Epoch(train) [12][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:05:12  time: 1.4190  data_time: 0.0104  memory: 7622  loss: 0.7382  loss_cls: 0.2966  loss_bbox: 0.4416
+01/22 11:56:22 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 11:56:22 - mmengine - INFO - Saving checkpoint at 12 epochs
+01/22 11:57:56 - mmengine - INFO - Epoch(train) [13][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:04:08  time: 1.8580  data_time: 0.2549  memory: 7622  loss: 0.7216  loss_cls: 0.2873  loss_bbox: 0.4343
+01/22 11:59:07 - mmengine - INFO - Epoch(train) [13][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:02:18  time: 1.4152  data_time: 0.0111  memory: 7622  loss: 0.6921  loss_cls: 0.2665  loss_bbox: 0.4255
+01/22 11:59:20 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:00:54 - mmengine - INFO - Epoch(train) [14][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 3:01:18  time: 1.8821  data_time: 0.2586  memory: 7622  loss: 0.7174  loss_cls: 0.2805  loss_bbox: 0.4369
+01/22 12:02:05 - mmengine - INFO - Epoch(train) [14][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:59:29  time: 1.4104  data_time: 0.0108  memory: 7622  loss: 0.7003  loss_cls: 0.2763  loss_bbox: 0.4240
+01/22 12:02:18 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:02:18 - mmengine - INFO - Saving checkpoint at 14 epochs
+01/22 12:03:56 - mmengine - INFO - Epoch(train) [15][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:58:29  time: 1.9083  data_time: 0.2221  memory: 7622  loss: 0.7182  loss_cls: 0.2795  loss_bbox: 0.4387
+01/22 12:05:05 - mmengine - INFO - Epoch(train) [15][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:56:39  time: 1.3884  data_time: 0.0094  memory: 7622  loss: 0.6930  loss_cls: 0.2748  loss_bbox: 0.4182
+01/22 12:05:18 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:06:52 - mmengine - INFO - Epoch(train) [16][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:55:30  time: 1.8732  data_time: 0.2268  memory: 7622  loss: 0.6888  loss_cls: 0.2682  loss_bbox: 0.4206
+01/22 12:08:02 - mmengine - INFO - Epoch(train) [16][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:53:45  time: 1.4027  data_time: 0.0096  memory: 7622  loss: 0.6665  loss_cls: 0.2575  loss_bbox: 0.4090
+01/22 12:08:15 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:08:15 - mmengine - INFO - Saving checkpoint at 16 epochs
+01/22 12:09:51 - mmengine - INFO - Epoch(train) [17][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:52:34  time: 1.8823  data_time: 0.2644  memory: 7622  loss: 0.6782  loss_cls: 0.2633  loss_bbox: 0.4149
+01/22 12:11:03 - mmengine - INFO - Epoch(train) [17][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:50:57  time: 1.4389  data_time: 0.0098  memory: 7622  loss: 0.6901  loss_cls: 0.2688  loss_bbox: 0.4214
+01/22 12:11:16 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:12:51 - mmengine - INFO - Epoch(train) [18][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:49:48  time: 1.9025  data_time: 0.2662  memory: 7622  loss: 0.6517  loss_cls: 0.2448  loss_bbox: 0.4069
+01/22 12:13:08 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:14:01 - mmengine - INFO - Epoch(train) [18][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:48:08  time: 1.4108  data_time: 0.0101  memory: 7622  loss: 0.6623  loss_cls: 0.2533  loss_bbox: 0.4089
+01/22 12:14:14 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:14:14 - mmengine - INFO - Saving checkpoint at 18 epochs
+01/22 12:15:52 - mmengine - INFO - Epoch(train) [19][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:46:55  time: 1.9031  data_time: 0.2544  memory: 7622  loss: 0.6456  loss_cls: 0.2424  loss_bbox: 0.4032
+01/22 12:17:03 - mmengine - INFO - Epoch(train) [19][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:45:17  time: 1.4162  data_time: 0.0102  memory: 7622  loss: 0.6375  loss_cls: 0.2379  loss_bbox: 0.3996
+01/22 12:17:16 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:18:49 - mmengine - INFO - Epoch(train) [20][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:43:58  time: 1.8662  data_time: 0.1834  memory: 7622  loss: 0.6628  loss_cls: 0.2529  loss_bbox: 0.4100
+01/22 12:19:59 - mmengine - INFO - Epoch(train) [20][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:42:21  time: 1.4082  data_time: 0.0112  memory: 7622  loss: 0.6393  loss_cls: 0.2392  loss_bbox: 0.4001
+01/22 12:20:12 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:20:12 - mmengine - INFO - Saving checkpoint at 20 epochs
+01/22 12:20:20 - mmengine - INFO - Epoch(val) [20][50/91]    eta: 0:00:04  time: 0.1178  data_time: 0.0300  memory: 7622  
+01/22 12:20:25 - mmengine - INFO - Evaluating bbox...
+Loading and preparing results...
+DONE (t=0.02s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=1.65s).
+Accumulating evaluation results...
+DONE (t=0.18s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.440
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.789
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.448
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.219
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.489
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.414
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.178
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.541
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.552
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.336
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.601
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.526
+01/22 12:20:27 - mmengine - INFO - bbox_mAP_copypaste: 0.440 0.789 0.448 0.219 0.489 0.414
+01/22 12:20:27 - mmengine - INFO - Epoch(val) [20][91/91]    coco/bbox_mAP: 0.4400  coco/bbox_mAP_50: 0.7890  coco/bbox_mAP_75: 0.4480  coco/bbox_mAP_s: 0.2190  coco/bbox_mAP_m: 0.4890  coco/bbox_mAP_l: 0.4140  data_time: 0.0269  time: 0.1145
+01/22 12:20:27 - mmengine - INFO - The previous best checkpoint /content/autoOD-main/runs_archive/train1/models/best_coco_bbox_mAP_epoch_10.pth is removed
+01/22 12:20:28 - mmengine - INFO - The best checkpoint with 0.4400 coco/bbox_mAP at 20 epoch is saved to best_coco_bbox_mAP_epoch_20.pth.
+01/22 12:22:04 - mmengine - INFO - Epoch(train) [21][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:41:01  time: 1.8709  data_time: 0.2574  memory: 7622  loss: 0.6810  loss_cls: 0.2666  loss_bbox: 0.4144
+01/22 12:23:15 - mmengine - INFO - Epoch(train) [21][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:39:27  time: 1.4292  data_time: 0.0104  memory: 7622  loss: 0.6457  loss_cls: 0.2440  loss_bbox: 0.4017
+01/22 12:23:28 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:25:02 - mmengine - INFO - Epoch(train) [22][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:38:05  time: 1.8696  data_time: 0.2746  memory: 7622  loss: 0.6535  loss_cls: 0.2474  loss_bbox: 0.4060
+01/22 12:26:13 - mmengine - INFO - Epoch(train) [22][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:36:32  time: 1.4280  data_time: 0.0120  memory: 7622  loss: 0.6329  loss_cls: 0.2343  loss_bbox: 0.3986
+01/22 12:26:26 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:26:26 - mmengine - INFO - Saving checkpoint at 22 epochs
+01/22 12:28:03 - mmengine - INFO - Epoch(train) [23][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:35:13  time: 1.8991  data_time: 0.2414  memory: 7622  loss: 0.6393  loss_cls: 0.2432  loss_bbox: 0.3961
+01/22 12:29:14 - mmengine - INFO - Epoch(train) [23][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:33:39  time: 1.4101  data_time: 0.0101  memory: 7622  loss: 0.6341  loss_cls: 0.2369  loss_bbox: 0.3972
+01/22 12:29:27 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:31:00 - mmengine - INFO - Epoch(train) [24][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:32:15  time: 1.8660  data_time: 0.2324  memory: 7622  loss: 0.6221  loss_cls: 0.2281  loss_bbox: 0.3940
+01/22 12:32:12 - mmengine - INFO - Epoch(train) [24][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:30:45  time: 1.4360  data_time: 0.0120  memory: 7622  loss: 0.6397  loss_cls: 0.2412  loss_bbox: 0.3985
+01/22 12:32:25 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:32:25 - mmengine - INFO - Saving checkpoint at 24 epochs
+01/22 12:34:00 - mmengine - INFO - Epoch(train) [25][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:29:21  time: 1.8743  data_time: 0.2214  memory: 7622  loss: 0.6565  loss_cls: 0.2527  loss_bbox: 0.4038
+01/22 12:35:12 - mmengine - INFO - Epoch(train) [25][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:27:51  time: 1.4294  data_time: 0.0102  memory: 7622  loss: 0.6250  loss_cls: 0.2328  loss_bbox: 0.3921
+01/22 12:35:25 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:36:59 - mmengine - INFO - Epoch(train) [26][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:26:27  time: 1.8861  data_time: 0.2371  memory: 7622  loss: 0.6087  loss_cls: 0.2245  loss_bbox: 0.3843
+01/22 12:38:10 - mmengine - INFO - Epoch(train) [26][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:24:56  time: 1.4174  data_time: 0.0103  memory: 7622  loss: 0.6366  loss_cls: 0.2381  loss_bbox: 0.3986
+01/22 12:38:23 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:38:23 - mmengine - INFO - Saving checkpoint at 26 epochs
+01/22 12:39:40 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:40:00 - mmengine - INFO - Epoch(train) [27][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:23:30  time: 1.8841  data_time: 0.2045  memory: 7622  loss: 0.6615  loss_cls: 0.2564  loss_bbox: 0.4051
+01/22 12:41:11 - mmengine - INFO - Epoch(train) [27][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:22:01  time: 1.4264  data_time: 0.0098  memory: 7622  loss: 0.6348  loss_cls: 0.2390  loss_bbox: 0.3958
+01/22 12:41:24 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:42:58 - mmengine - INFO - Epoch(train) [28][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:20:34  time: 1.8733  data_time: 0.1778  memory: 7622  loss: 0.6473  loss_cls: 0.2466  loss_bbox: 0.4007
+01/22 12:44:10 - mmengine - INFO - Epoch(train) [28][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:19:07  time: 1.4479  data_time: 0.0106  memory: 7622  loss: 0.6332  loss_cls: 0.2399  loss_bbox: 0.3933
+01/22 12:44:23 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:44:23 - mmengine - INFO - Saving checkpoint at 28 epochs
+01/22 12:46:00 - mmengine - INFO - Epoch(train) [29][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:17:41  time: 1.8975  data_time: 0.2502  memory: 7622  loss: 0.6538  loss_cls: 0.2542  loss_bbox: 0.3996
+01/22 12:47:11 - mmengine - INFO - Epoch(train) [29][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:16:12  time: 1.4240  data_time: 0.0117  memory: 7622  loss: 0.6255  loss_cls: 0.2335  loss_bbox: 0.3920
+01/22 12:47:24 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:49:01 - mmengine - INFO - Epoch(train) [30][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:14:49  time: 1.9447  data_time: 0.2630  memory: 7622  loss: 0.6018  loss_cls: 0.2184  loss_bbox: 0.3834
+01/22 12:50:11 - mmengine - INFO - Epoch(train) [30][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:13:20  time: 1.4052  data_time: 0.0109  memory: 7622  loss: 0.6227  loss_cls: 0.2315  loss_bbox: 0.3912
+01/22 12:50:24 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:50:24 - mmengine - INFO - Saving checkpoint at 30 epochs
+01/22 12:50:32 - mmengine - INFO - Epoch(val) [30][50/91]    eta: 0:00:04  time: 0.1202  data_time: 0.0239  memory: 7622  
+01/22 12:50:36 - mmengine - INFO - Evaluating bbox...
+Loading and preparing results...
+DONE (t=0.34s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=3.86s).
+Accumulating evaluation results...
+DONE (t=0.43s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.406
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.726
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.417
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.207
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.452
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.384
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.175
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.506
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.535
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.332
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.578
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.533
+01/22 12:50:41 - mmengine - INFO - bbox_mAP_copypaste: 0.406 0.726 0.417 0.207 0.452 0.384
+01/22 12:50:41 - mmengine - INFO - Epoch(val) [30][91/91]    coco/bbox_mAP: 0.4060  coco/bbox_mAP_50: 0.7260  coco/bbox_mAP_75: 0.4170  coco/bbox_mAP_s: 0.2070  coco/bbox_mAP_m: 0.4520  coco/bbox_mAP_l: 0.3840  data_time: 0.0184  time: 0.1030
+01/22 12:52:15 - mmengine - INFO - Epoch(train) [31][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:11:50  time: 1.8708  data_time: 0.1898  memory: 7622  loss: 0.6258  loss_cls: 0.2323  loss_bbox: 0.3935
+01/22 12:53:26 - mmengine - INFO - Epoch(train) [31][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:10:23  time: 1.4260  data_time: 0.0101  memory: 7622  loss: 0.6225  loss_cls: 0.2325  loss_bbox: 0.3900
+01/22 12:53:39 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:55:13 - mmengine - INFO - Epoch(train) [32][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:08:54  time: 1.8780  data_time: 0.1851  memory: 7622  loss: 0.6220  loss_cls: 0.2309  loss_bbox: 0.3911
+01/22 12:56:25 - mmengine - INFO - Epoch(train) [32][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:07:28  time: 1.4403  data_time: 0.0116  memory: 7622  loss: 0.6162  loss_cls: 0.2262  loss_bbox: 0.3900
+01/22 12:56:38 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 12:56:38 - mmengine - INFO - Saving checkpoint at 32 epochs
+01/22 12:58:14 - mmengine - INFO - Epoch(train) [33][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:05:58  time: 1.8799  data_time: 0.2697  memory: 7622  loss: 0.6085  loss_cls: 0.2219  loss_bbox: 0.3866
+01/22 12:59:25 - mmengine - INFO - Epoch(train) [33][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:04:31  time: 1.4186  data_time: 0.0106  memory: 7622  loss: 0.6312  loss_cls: 0.2414  loss_bbox: 0.3899
+01/22 12:59:38 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:01:14 - mmengine - INFO - Epoch(train) [34][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:03:04  time: 1.9263  data_time: 0.2699  memory: 7622  loss: 0.5987  loss_cls: 0.2194  loss_bbox: 0.3793
+01/22 13:02:25 - mmengine - INFO - Epoch(train) [34][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:01:37  time: 1.4146  data_time: 0.0112  memory: 7622  loss: 0.5803  loss_cls: 0.2095  loss_bbox: 0.3707
+01/22 13:02:37 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:02:37 - mmengine - INFO - Saving checkpoint at 34 epochs
+01/22 13:04:15 - mmengine - INFO - Epoch(train) [35][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 2:00:07  time: 1.9015  data_time: 0.1806  memory: 7622  loss: 0.6161  loss_cls: 0.2322  loss_bbox: 0.3839
+01/22 13:05:27 - mmengine - INFO - Epoch(train) [35][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 1:58:42  time: 1.4369  data_time: 0.0112  memory: 7622  loss: 0.6329  loss_cls: 0.2410  loss_bbox: 0.3919
+01/22 13:05:40 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:06:16 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:07:16 - mmengine - INFO - Epoch(train) [36][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 1:57:13  time: 1.9143  data_time: 0.2748  memory: 7622  loss: 0.6308  loss_cls: 0.2371  loss_bbox: 0.3937
+01/22 13:08:27 - mmengine - INFO - Epoch(train) [36][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 1:55:48  time: 1.4339  data_time: 0.0105  memory: 7622  loss: 0.6332  loss_cls: 0.2421  loss_bbox: 0.3911
+01/22 13:08:40 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:08:40 - mmengine - INFO - Saving checkpoint at 36 epochs
+01/22 13:10:20 - mmengine - INFO - Epoch(train) [37][ 50/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 1:54:19  time: 1.9524  data_time: 0.2371  memory: 7622  loss: 0.6275  loss_cls: 0.2372  loss_bbox: 0.3902
+01/22 13:11:32 - mmengine - INFO - Epoch(train) [37][100/114]  base_lr: 4.0000e-03 lr: 4.0000e-03  eta: 1:52:55  time: 1.4489  data_time: 0.0106  memory: 7622  loss: 0.5950  loss_cls: 0.2201  loss_bbox: 0.3749
+01/22 13:11:46 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:13:21 - mmengine - INFO - Epoch(train) [38][ 50/114]  base_lr: 3.9997e-03 lr: 3.9997e-03  eta: 1:51:24  time: 1.9011  data_time: 0.1970  memory: 7622  loss: 0.6014  loss_cls: 0.2217  loss_bbox: 0.3797
+01/22 13:14:33 - mmengine - INFO - Epoch(train) [38][100/114]  base_lr: 3.9987e-03 lr: 3.9987e-03  eta: 1:50:01  time: 1.4510  data_time: 0.0135  memory: 7622  loss: 0.6148  loss_cls: 0.2263  loss_bbox: 0.3886
+01/22 13:14:46 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:14:46 - mmengine - INFO - Saving checkpoint at 38 epochs
+01/22 13:16:26 - mmengine - INFO - Epoch(train) [39][ 50/114]  base_lr: 3.9966e-03 lr: 3.9966e-03  eta: 1:48:31  time: 1.9597  data_time: 0.2891  memory: 7622  loss: 0.5810  loss_cls: 0.2092  loss_bbox: 0.3718
+01/22 13:17:36 - mmengine - INFO - Epoch(train) [39][100/114]  base_lr: 3.9942e-03 lr: 3.9942e-03  eta: 1:47:06  time: 1.4058  data_time: 0.0108  memory: 7622  loss: 0.5728  loss_cls: 0.2060  loss_bbox: 0.3669
+01/22 13:17:50 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:19:26 - mmengine - INFO - Epoch(train) [40][ 50/114]  base_lr: 3.9902e-03 lr: 3.9902e-03  eta: 1:45:34  time: 1.9146  data_time: 0.2239  memory: 7622  loss: 0.6089  loss_cls: 0.2252  loss_bbox: 0.3838
+01/22 13:20:39 - mmengine - INFO - Epoch(train) [40][100/114]  base_lr: 3.9863e-03 lr: 3.9863e-03  eta: 1:44:12  time: 1.4599  data_time: 0.0129  memory: 7622  loss: 0.5932  loss_cls: 0.2150  loss_bbox: 0.3782
+01/22 13:20:51 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:20:51 - mmengine - INFO - Saving checkpoint at 40 epochs
+01/22 13:20:59 - mmengine - INFO - Epoch(val) [40][50/91]    eta: 0:00:04  time: 0.1208  data_time: 0.0308  memory: 7622  
+01/22 13:21:05 - mmengine - INFO - Evaluating bbox...
+Loading and preparing results...
+DONE (t=0.02s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=1.44s).
+Accumulating evaluation results...
+DONE (t=0.24s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.533
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.885
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.563
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.313
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.571
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.551
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.207
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.605
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.616
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.426
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.652
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.636
+01/22 13:21:06 - mmengine - INFO - bbox_mAP_copypaste: 0.533 0.885 0.563 0.313 0.571 0.551
+01/22 13:21:06 - mmengine - INFO - Epoch(val) [40][91/91]    coco/bbox_mAP: 0.5330  coco/bbox_mAP_50: 0.8850  coco/bbox_mAP_75: 0.5630  coco/bbox_mAP_s: 0.3130  coco/bbox_mAP_m: 0.5710  coco/bbox_mAP_l: 0.5510  data_time: 0.0255  time: 0.1183
+01/22 13:21:06 - mmengine - INFO - The previous best checkpoint /content/autoOD-main/runs_archive/train1/models/best_coco_bbox_mAP_epoch_20.pth is removed
+01/22 13:21:08 - mmengine - INFO - The best checkpoint with 0.5330 coco/bbox_mAP at 40 epoch is saved to best_coco_bbox_mAP_epoch_40.pth.
+01/22 13:22:45 - mmengine - INFO - Epoch(train) [41][ 50/114]  base_lr: 3.9804e-03 lr: 3.9804e-03  eta: 1:42:39  time: 1.9030  data_time: 0.2777  memory: 7622  loss: 0.5962  loss_cls: 0.2202  loss_bbox: 0.3760
+01/22 13:23:57 - mmengine - INFO - Epoch(train) [41][100/114]  base_lr: 3.9751e-03 lr: 3.9751e-03  eta: 1:41:16  time: 1.4427  data_time: 0.0130  memory: 7622  loss: 0.6011  loss_cls: 0.2237  loss_bbox: 0.3775
+01/22 13:24:10 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:25:47 - mmengine - INFO - Epoch(train) [42][ 50/114]  base_lr: 3.9674e-03 lr: 3.9674e-03  eta: 1:39:44  time: 1.9440  data_time: 0.2704  memory: 7622  loss: 0.6027  loss_cls: 0.2250  loss_bbox: 0.3776
+01/22 13:26:58 - mmengine - INFO - Epoch(train) [42][100/114]  base_lr: 3.9606e-03 lr: 3.9606e-03  eta: 1:38:20  time: 1.4233  data_time: 0.0104  memory: 7622  loss: 0.6102  loss_cls: 0.2266  loss_bbox: 0.3836
+01/22 13:27:11 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:27:11 - mmengine - INFO - Saving checkpoint at 42 epochs
+01/22 13:28:48 - mmengine - INFO - Epoch(train) [43][ 50/114]  base_lr: 3.9511e-03 lr: 3.9511e-03  eta: 1:36:46  time: 1.8953  data_time: 0.2077  memory: 7622  loss: 0.6179  loss_cls: 0.2348  loss_bbox: 0.3831
+01/22 13:29:59 - mmengine - INFO - Epoch(train) [43][100/114]  base_lr: 3.9429e-03 lr: 3.9429e-03  eta: 1:35:23  time: 1.4269  data_time: 0.0149  memory: 7622  loss: 0.5888  loss_cls: 0.2175  loss_bbox: 0.3712
+01/22 13:30:12 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:31:48 - mmengine - INFO - Epoch(train) [44][ 50/114]  base_lr: 3.9315e-03 lr: 3.9315e-03  eta: 1:33:49  time: 1.9159  data_time: 0.2512  memory: 7622  loss: 0.5908  loss_cls: 0.2159  loss_bbox: 0.3750
+01/22 13:32:58 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:33:00 - mmengine - INFO - Epoch(train) [44][100/114]  base_lr: 3.9219e-03 lr: 3.9219e-03  eta: 1:32:26  time: 1.4383  data_time: 0.0140  memory: 7622  loss: 0.5988  loss_cls: 0.2228  loss_bbox: 0.3760
+01/22 13:33:14 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:33:14 - mmengine - INFO - Saving checkpoint at 44 epochs
+01/22 13:34:52 - mmengine - INFO - Epoch(train) [45][ 50/114]  base_lr: 3.9087e-03 lr: 3.9087e-03  eta: 1:30:53  time: 1.9195  data_time: 0.2501  memory: 7622  loss: 0.5739  loss_cls: 0.2095  loss_bbox: 0.3644
+01/22 13:36:03 - mmengine - INFO - Epoch(train) [45][100/114]  base_lr: 3.8977e-03 lr: 3.8977e-03  eta: 1:29:29  time: 1.4122  data_time: 0.0121  memory: 7622  loss: 0.5747  loss_cls: 0.2086  loss_bbox: 0.3662
+01/22 13:36:16 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:37:50 - mmengine - INFO - Epoch(train) [46][ 50/114]  base_lr: 3.8828e-03 lr: 3.8828e-03  eta: 1:27:54  time: 1.8836  data_time: 0.2167  memory: 7622  loss: 0.5842  loss_cls: 0.2142  loss_bbox: 0.3700
+01/22 13:39:02 - mmengine - INFO - Epoch(train) [46][100/114]  base_lr: 3.8704e-03 lr: 3.8704e-03  eta: 1:26:32  time: 1.4355  data_time: 0.0131  memory: 7622  loss: 0.5792  loss_cls: 0.2107  loss_bbox: 0.3684
+01/22 13:39:15 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:39:15 - mmengine - INFO - Saving checkpoint at 46 epochs
+01/22 13:40:50 - mmengine - INFO - Epoch(train) [47][ 50/114]  base_lr: 3.8537e-03 lr: 3.8537e-03  eta: 1:24:56  time: 1.8714  data_time: 0.2419  memory: 7622  loss: 0.5842  loss_cls: 0.2108  loss_bbox: 0.3734
+01/22 13:42:02 - mmengine - INFO - Epoch(train) [47][100/114]  base_lr: 3.8400e-03 lr: 3.8400e-03  eta: 1:23:33  time: 1.4295  data_time: 0.0123  memory: 7622  loss: 0.5747  loss_cls: 0.2099  loss_bbox: 0.3648
+01/22 13:42:15 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:43:51 - mmengine - INFO - Epoch(train) [48][ 50/114]  base_lr: 3.8215e-03 lr: 3.8215e-03  eta: 1:21:58  time: 1.9275  data_time: 0.2787  memory: 7622  loss: 0.5900  loss_cls: 0.2227  loss_bbox: 0.3674
+01/22 13:45:02 - mmengine - INFO - Epoch(train) [48][100/114]  base_lr: 3.8065e-03 lr: 3.8065e-03  eta: 1:20:36  time: 1.4110  data_time: 0.0130  memory: 7622  loss: 0.5912  loss_cls: 0.2235  loss_bbox: 0.3677
+01/22 13:45:15 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:45:15 - mmengine - INFO - Saving checkpoint at 48 epochs
+01/22 13:46:52 - mmengine - INFO - Epoch(train) [49][ 50/114]  base_lr: 3.7864e-03 lr: 3.7864e-03  eta: 1:19:00  time: 1.8867  data_time: 0.2070  memory: 7622  loss: 0.5660  loss_cls: 0.2084  loss_bbox: 0.3577
+01/22 13:48:04 - mmengine - INFO - Epoch(train) [49][100/114]  base_lr: 3.7700e-03 lr: 3.7700e-03  eta: 1:17:38  time: 1.4362  data_time: 0.0140  memory: 7622  loss: 0.5711  loss_cls: 0.2080  loss_bbox: 0.3631
+01/22 13:48:17 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:49:51 - mmengine - INFO - Epoch(train) [50][ 50/114]  base_lr: 3.7482e-03 lr: 3.7482e-03  eta: 1:16:02  time: 1.8898  data_time: 0.2266  memory: 7622  loss: 0.5773  loss_cls: 0.2091  loss_bbox: 0.3682
+01/22 13:51:02 - mmengine - INFO - Epoch(train) [50][100/114]  base_lr: 3.7306e-03 lr: 3.7306e-03  eta: 1:14:40  time: 1.4191  data_time: 0.0139  memory: 7622  loss: 0.6008  loss_cls: 0.2233  loss_bbox: 0.3775
+01/22 13:51:15 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:51:15 - mmengine - INFO - Saving checkpoint at 50 epochs
+01/22 13:51:23 - mmengine - INFO - Epoch(val) [50][50/91]    eta: 0:00:05  time: 0.1252  data_time: 0.0277  memory: 7622  
+01/22 13:51:28 - mmengine - INFO - Evaluating bbox...
+Loading and preparing results...
+DONE (t=0.01s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=1.32s).
+Accumulating evaluation results...
+DONE (t=0.15s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.487
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.804
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.492
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.309
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.546
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.335
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.193
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.559
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.566
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.422
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.604
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.528
+01/22 13:51:29 - mmengine - INFO - bbox_mAP_copypaste: 0.487 0.804 0.492 0.309 0.546 0.335
+01/22 13:51:29 - mmengine - INFO - Epoch(val) [50][91/91]    coco/bbox_mAP: 0.4870  coco/bbox_mAP_50: 0.8040  coco/bbox_mAP_75: 0.4920  coco/bbox_mAP_s: 0.3090  coco/bbox_mAP_m: 0.5460  coco/bbox_mAP_l: 0.3350  data_time: 0.0250  time: 0.1167
+01/22 13:53:04 - mmengine - INFO - Epoch(train) [51][ 50/114]  base_lr: 3.7072e-03 lr: 3.7072e-03  eta: 1:13:03  time: 1.8840  data_time: 0.2299  memory: 7622  loss: 0.6040  loss_cls: 0.2284  loss_bbox: 0.3756
+01/22 13:54:16 - mmengine - INFO - Epoch(train) [51][100/114]  base_lr: 3.6883e-03 lr: 3.6883e-03  eta: 1:11:42  time: 1.4551  data_time: 0.0144  memory: 7622  loss: 0.5866  loss_cls: 0.2143  loss_bbox: 0.3723
+01/22 13:54:30 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:56:05 - mmengine - INFO - Epoch(train) [52][ 50/114]  base_lr: 3.6634e-03 lr: 3.6634e-03  eta: 1:10:06  time: 1.9154  data_time: 0.2449  memory: 7622  loss: 0.6162  loss_cls: 0.2293  loss_bbox: 0.3869
+01/22 13:57:17 - mmengine - INFO - Epoch(train) [52][100/114]  base_lr: 3.6433e-03 lr: 3.6433e-03  eta: 1:08:45  time: 1.4397  data_time: 0.0138  memory: 7622  loss: 0.5821  loss_cls: 0.2090  loss_bbox: 0.3731
+01/22 13:57:30 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 13:57:30 - mmengine - INFO - Saving checkpoint at 52 epochs
+01/22 13:59:08 - mmengine - INFO - Epoch(train) [53][ 50/114]  base_lr: 3.6168e-03 lr: 3.6168e-03  eta: 1:07:08  time: 1.9035  data_time: 0.2401  memory: 7622  loss: 0.5613  loss_cls: 0.1996  loss_bbox: 0.3617
+01/22 13:59:42 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:00:20 - mmengine - INFO - Epoch(train) [53][100/114]  base_lr: 3.5955e-03 lr: 3.5955e-03  eta: 1:05:47  time: 1.4440  data_time: 0.0134  memory: 7622  loss: 0.5438  loss_cls: 0.1889  loss_bbox: 0.3549
+01/22 14:00:34 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:02:08 - mmengine - INFO - Epoch(train) [54][ 50/114]  base_lr: 3.5675e-03 lr: 3.5675e-03  eta: 1:04:10  time: 1.8762  data_time: 0.1912  memory: 7622  loss: 0.5631  loss_cls: 0.2032  loss_bbox: 0.3599
+01/22 14:03:20 - mmengine - INFO - Epoch(train) [54][100/114]  base_lr: 3.5451e-03 lr: 3.5451e-03  eta: 1:02:49  time: 1.4391  data_time: 0.0124  memory: 7622  loss: 0.5662  loss_cls: 0.1975  loss_bbox: 0.3687
+01/22 14:03:32 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:03:32 - mmengine - INFO - Saving checkpoint at 54 epochs
+01/22 14:05:09 - mmengine - INFO - Epoch(train) [55][ 50/114]  base_lr: 3.5157e-03 lr: 3.5157e-03  eta: 1:01:12  time: 1.9016  data_time: 0.2689  memory: 7622  loss: 0.5933  loss_cls: 0.2213  loss_bbox: 0.3720
+01/22 14:06:19 - mmengine - INFO - Epoch(train) [55][100/114]  base_lr: 3.4922e-03 lr: 3.4922e-03  eta: 0:59:50  time: 1.4006  data_time: 0.0127  memory: 7622  loss: 0.5888  loss_cls: 0.2186  loss_bbox: 0.3701
+01/22 14:06:32 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:08:05 - mmengine - INFO - Epoch(train) [56][ 50/114]  base_lr: 3.4614e-03 lr: 3.4614e-03  eta: 0:58:12  time: 1.8642  data_time: 0.2466  memory: 7622  loss: 0.5343  loss_cls: 0.1878  loss_bbox: 0.3465
+01/22 14:09:15 - mmengine - INFO - Epoch(train) [56][100/114]  base_lr: 3.4368e-03 lr: 3.4368e-03  eta: 0:56:51  time: 1.3867  data_time: 0.0139  memory: 7622  loss: 0.5413  loss_cls: 0.1918  loss_bbox: 0.3495
+01/22 14:09:27 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:09:27 - mmengine - INFO - Saving checkpoint at 56 epochs
+01/22 14:11:03 - mmengine - INFO - Epoch(train) [57][ 50/114]  base_lr: 3.4047e-03 lr: 3.4047e-03  eta: 0:55:13  time: 1.8610  data_time: 0.1878  memory: 7622  loss: 0.5565  loss_cls: 0.1954  loss_bbox: 0.3611
+01/22 14:12:12 - mmengine - INFO - Epoch(train) [57][100/114]  base_lr: 3.3791e-03 lr: 3.3791e-03  eta: 0:53:51  time: 1.3844  data_time: 0.0122  memory: 7622  loss: 0.5608  loss_cls: 0.2054  loss_bbox: 0.3554
+01/22 14:12:25 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:13:57 - mmengine - INFO - Epoch(train) [58][ 50/114]  base_lr: 3.3457e-03 lr: 3.3457e-03  eta: 0:52:13  time: 1.8324  data_time: 0.2032  memory: 7622  loss: 0.5350  loss_cls: 0.1897  loss_bbox: 0.3453
+01/22 14:15:06 - mmengine - INFO - Epoch(train) [58][100/114]  base_lr: 3.3192e-03 lr: 3.3192e-03  eta: 0:50:52  time: 1.3794  data_time: 0.0119  memory: 7622  loss: 0.5405  loss_cls: 0.1902  loss_bbox: 0.3502
+01/22 14:15:19 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:15:19 - mmengine - INFO - Saving checkpoint at 58 epochs
+01/22 14:16:52 - mmengine - INFO - Epoch(train) [59][ 50/114]  base_lr: 3.2846e-03 lr: 3.2846e-03  eta: 0:49:13  time: 1.8351  data_time: 0.2613  memory: 7622  loss: 0.5498  loss_cls: 0.1987  loss_bbox: 0.3511
+01/22 14:18:02 - mmengine - INFO - Epoch(train) [59][100/114]  base_lr: 3.2571e-03 lr: 3.2571e-03  eta: 0:47:52  time: 1.3987  data_time: 0.0116  memory: 7622  loss: 0.5577  loss_cls: 0.1994  loss_bbox: 0.3583
+01/22 14:18:16 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:19:48 - mmengine - INFO - Epoch(train) [60][ 50/114]  base_lr: 3.2213e-03 lr: 3.2213e-03  eta: 0:46:14  time: 1.8440  data_time: 0.2443  memory: 7622  loss: 0.5477  loss_cls: 0.1966  loss_bbox: 0.3511
+01/22 14:20:58 - mmengine - INFO - Epoch(train) [60][100/114]  base_lr: 3.1929e-03 lr: 3.1929e-03  eta: 0:44:54  time: 1.4140  data_time: 0.0120  memory: 7622  loss: 0.5105  loss_cls: 0.1721  loss_bbox: 0.3384
+01/22 14:21:11 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:21:11 - mmengine - INFO - Saving checkpoint at 60 epochs
+01/22 14:21:20 - mmengine - INFO - Epoch(val) [60][50/91]    eta: 0:00:05  time: 0.1401  data_time: 0.0356  memory: 7622  
+01/22 14:21:25 - mmengine - INFO - Evaluating bbox...
+Loading and preparing results...
+DONE (t=0.01s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=1.08s).
+Accumulating evaluation results...
+DONE (t=0.16s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.607
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.946
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.667
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.397
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.646
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.620
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.233
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.662
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.668
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.475
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.703
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.687
+01/22 14:21:26 - mmengine - INFO - bbox_mAP_copypaste: 0.607 0.946 0.667 0.397 0.646 0.620
+01/22 14:21:26 - mmengine - INFO - Epoch(val) [60][91/91]    coco/bbox_mAP: 0.6070  coco/bbox_mAP_50: 0.9460  coco/bbox_mAP_75: 0.6670  coco/bbox_mAP_s: 0.3970  coco/bbox_mAP_m: 0.6460  coco/bbox_mAP_l: 0.6200  data_time: 0.0277  time: 0.1232
+01/22 14:21:26 - mmengine - INFO - The previous best checkpoint /content/autoOD-main/runs_archive/train1/models/best_coco_bbox_mAP_epoch_40.pth is removed
+01/22 14:21:27 - mmengine - INFO - The best checkpoint with 0.6070 coco/bbox_mAP at 60 epoch is saved to best_coco_bbox_mAP_epoch_60.pth.
+01/22 14:23:03 - mmengine - INFO - Epoch(train) [61][ 50/114]  base_lr: 3.1561e-03 lr: 3.1561e-03  eta: 0:43:15  time: 1.8639  data_time: 0.2543  memory: 7622  loss: 0.5366  loss_cls: 0.1906  loss_bbox: 0.3460
+01/22 14:24:13 - mmengine - INFO - Epoch(train) [61][100/114]  base_lr: 3.1269e-03 lr: 3.1269e-03  eta: 0:41:55  time: 1.4043  data_time: 0.0130  memory: 7622  loss: 0.5340  loss_cls: 0.1868  loss_bbox: 0.3472
+01/22 14:24:26 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:25:53 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:25:58 - mmengine - INFO - Epoch(train) [62][ 50/114]  base_lr: 3.0890e-03 lr: 3.0890e-03  eta: 0:40:16  time: 1.8540  data_time: 0.2744  memory: 7622  loss: 0.5371  loss_cls: 0.1872  loss_bbox: 0.3498
+01/22 14:27:08 - mmengine - INFO - Epoch(train) [62][100/114]  base_lr: 3.0591e-03 lr: 3.0591e-03  eta: 0:38:56  time: 1.3963  data_time: 0.0116  memory: 7622  loss: 0.5402  loss_cls: 0.1877  loss_bbox: 0.3525
+01/22 14:27:21 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:27:21 - mmengine - INFO - Saving checkpoint at 62 epochs
+01/22 14:28:58 - mmengine - INFO - Epoch(train) [63][ 50/114]  base_lr: 3.0202e-03 lr: 3.0202e-03  eta: 0:37:18  time: 1.8943  data_time: 0.2323  memory: 7622  loss: 0.5339  loss_cls: 0.1929  loss_bbox: 0.3410
+01/22 14:30:07 - mmengine - INFO - Epoch(train) [63][100/114]  base_lr: 2.9895e-03 lr: 2.9895e-03  eta: 0:35:58  time: 1.3772  data_time: 0.0120  memory: 7622  loss: 0.5586  loss_cls: 0.2038  loss_bbox: 0.3547
+01/22 14:30:20 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:31:53 - mmengine - INFO - Epoch(train) [64][ 50/114]  base_lr: 2.9498e-03 lr: 2.9498e-03  eta: 0:34:19  time: 1.8536  data_time: 0.2362  memory: 7622  loss: 0.5375  loss_cls: 0.1878  loss_bbox: 0.3497
+01/22 14:33:02 - mmengine - INFO - Epoch(train) [64][100/114]  base_lr: 2.9184e-03 lr: 2.9184e-03  eta: 0:32:59  time: 1.3879  data_time: 0.0136  memory: 7622  loss: 0.5231  loss_cls: 0.1839  loss_bbox: 0.3392
+01/22 14:33:15 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:33:15 - mmengine - INFO - Saving checkpoint at 64 epochs
+01/22 14:34:50 - mmengine - INFO - Epoch(train) [65][ 50/114]  base_lr: 2.8779e-03 lr: 2.8779e-03  eta: 0:31:20  time: 1.8669  data_time: 0.2449  memory: 7622  loss: 0.5280  loss_cls: 0.1844  loss_bbox: 0.3436
+01/22 14:36:00 - mmengine - INFO - Epoch(train) [65][100/114]  base_lr: 2.8459e-03 lr: 2.8459e-03  eta: 0:30:01  time: 1.3953  data_time: 0.0131  memory: 7622  loss: 0.5262  loss_cls: 0.1804  loss_bbox: 0.3458
+01/22 14:36:13 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:37:44 - mmengine - INFO - Epoch(train) [66][ 50/114]  base_lr: 2.8046e-03 lr: 2.8046e-03  eta: 0:28:22  time: 1.8204  data_time: 0.2282  memory: 7622  loss: 0.5438  loss_cls: 0.1953  loss_bbox: 0.3485
+01/22 14:38:54 - mmengine - INFO - Epoch(train) [66][100/114]  base_lr: 2.7721e-03 lr: 2.7721e-03  eta: 0:27:02  time: 1.3902  data_time: 0.0131  memory: 7622  loss: 0.5244  loss_cls: 0.1885  loss_bbox: 0.3359
+01/22 14:39:07 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:39:07 - mmengine - INFO - Saving checkpoint at 66 epochs
+01/22 14:40:40 - mmengine - INFO - Epoch(train) [67][ 50/114]  base_lr: 2.7301e-03 lr: 2.7301e-03  eta: 0:25:23  time: 1.8343  data_time: 0.2189  memory: 7622  loss: 0.5366  loss_cls: 0.1905  loss_bbox: 0.3461
+01/22 14:41:50 - mmengine - INFO - Epoch(train) [67][100/114]  base_lr: 2.6971e-03 lr: 2.6971e-03  eta: 0:24:04  time: 1.3882  data_time: 0.0120  memory: 7622  loss: 0.5400  loss_cls: 0.1941  loss_bbox: 0.3458
+01/22 14:42:03 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:43:34 - mmengine - INFO - Epoch(train) [68][ 50/114]  base_lr: 2.6545e-03 lr: 2.6545e-03  eta: 0:22:25  time: 1.8247  data_time: 0.2250  memory: 7622  loss: 0.4979  loss_cls: 0.1737  loss_bbox: 0.3241
+01/22 14:44:44 - mmengine - INFO - Epoch(train) [68][100/114]  base_lr: 2.6210e-03 lr: 2.6210e-03  eta: 0:21:06  time: 1.3946  data_time: 0.0134  memory: 7622  loss: 0.4948  loss_cls: 0.1652  loss_bbox: 0.3296
+01/22 14:44:57 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:44:57 - mmengine - INFO - Saving checkpoint at 68 epochs
+01/22 14:46:29 - mmengine - INFO - Epoch(train) [69][ 50/114]  base_lr: 2.5779e-03 lr: 2.5779e-03  eta: 0:19:26  time: 1.8164  data_time: 0.2344  memory: 7622  loss: 0.5093  loss_cls: 0.1724  loss_bbox: 0.3369
+01/22 14:47:39 - mmengine - INFO - Epoch(train) [69][100/114]  base_lr: 2.5441e-03 lr: 2.5441e-03  eta: 0:18:08  time: 1.4039  data_time: 0.0124  memory: 7622  loss: 0.5100  loss_cls: 0.1729  loss_bbox: 0.3371
+01/22 14:47:52 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:49:25 - mmengine - INFO - Epoch(train) [70][ 50/114]  base_lr: 2.5005e-03 lr: 2.5005e-03  eta: 0:16:28  time: 1.8475  data_time: 0.2570  memory: 7622  loss: 0.5598  loss_cls: 0.2061  loss_bbox: 0.3537
+01/22 14:50:35 - mmengine - INFO - Epoch(train) [70][100/114]  base_lr: 2.4663e-03 lr: 2.4663e-03  eta: 0:15:10  time: 1.3986  data_time: 0.0129  memory: 7622  loss: 0.5191  loss_cls: 0.1793  loss_bbox: 0.3397
+01/22 14:50:47 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:50:47 - mmengine - INFO - Saving checkpoint at 70 epochs
+01/22 14:50:56 - mmengine - INFO - Epoch(val) [70][50/91]    eta: 0:00:06  time: 0.1464  data_time: 0.0394  memory: 7622  
+01/22 14:51:01 - mmengine - INFO - Evaluating bbox...
+Loading and preparing results...
+DONE (t=0.01s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=0.82s).
+Accumulating evaluation results...
+DONE (t=0.13s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.627
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.950
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.705
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.379
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.667
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.653
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.238
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.678
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.682
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.465
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.718
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.718
+01/22 14:51:02 - mmengine - INFO - bbox_mAP_copypaste: 0.627 0.950 0.705 0.379 0.667 0.653
+01/22 14:51:02 - mmengine - INFO - Epoch(val) [70][91/91]    coco/bbox_mAP: 0.6270  coco/bbox_mAP_50: 0.9500  coco/bbox_mAP_75: 0.7050  coco/bbox_mAP_s: 0.3790  coco/bbox_mAP_m: 0.6670  coco/bbox_mAP_l: 0.6530  data_time: 0.0297  time: 0.1250
+01/22 14:51:02 - mmengine - INFO - The previous best checkpoint /content/autoOD-main/runs_archive/train1/models/best_coco_bbox_mAP_epoch_60.pth is removed
+01/22 14:51:03 - mmengine - INFO - The best checkpoint with 0.6270 coco/bbox_mAP at 70 epoch is saved to best_coco_bbox_mAP_epoch_70.pth.
+01/22 14:51:55 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:52:37 - mmengine - INFO - Epoch(train) [71][ 50/114]  base_lr: 2.4224e-03 lr: 2.4224e-03  eta: 0:13:30  time: 1.8304  data_time: 0.2776  memory: 7622  loss: 0.5302  loss_cls: 0.1867  loss_bbox: 0.3435
+01/22 14:53:47 - mmengine - INFO - Epoch(train) [71][100/114]  base_lr: 2.3879e-03 lr: 2.3879e-03  eta: 0:12:12  time: 1.4053  data_time: 0.0113  memory: 7622  loss: 0.5050  loss_cls: 0.1744  loss_bbox: 0.3307
+01/22 14:54:00 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:55:31 - mmengine - INFO - Epoch(train) [72][ 50/114]  base_lr: 2.3437e-03 lr: 2.3437e-03  eta: 0:10:32  time: 1.8227  data_time: 0.2571  memory: 7622  loss: 0.5105  loss_cls: 0.1728  loss_bbox: 0.3377
+01/22 14:56:40 - mmengine - INFO - Epoch(train) [72][100/114]  base_lr: 2.3090e-03 lr: 2.3090e-03  eta: 0:09:14  time: 1.3787  data_time: 0.0127  memory: 7622  loss: 0.4935  loss_cls: 0.1692  loss_bbox: 0.3243
+01/22 14:56:53 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
+01/22 14:56:53 - mmengine - INFO - Saving checkpoint at 72 epochs
+01/22 14:58:27 - mmengine - INFO - Epoch(train) [73][ 50/114]  base_lr: 2.2646e-03 lr: 2.2646e-03  eta: 0:07:35  time: 1.8562  data_time: 0.2526  memory: 7622  loss: 0.5169  loss_cls: 0.1800  loss_bbox: 0.3369
+01/22 14:59:36 - mmengine - INFO - Epoch(train) [73][100/114]  base_lr: 2.2298e-03 lr: 2.2298e-03  eta: 0:06:16  time: 1.3789  data_time: 0.0128  memory: 7622  loss: 0.4941  loss_cls: 0.1696  loss_bbox: 0.3245
+01/22 14:59:49 - mmengine - INFO - Exp name: rtmdet_s_8xb32-300e_coco_custom_20240122_112029
